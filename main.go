@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -14,32 +13,30 @@ func main() {
 		log.Fatalf("error reading config: %v\n", err)
 	}
 
-	s := state{
+	programState := &state{
 		cfg: &cfg,
 	}
 	cmds := commands{
-		functions: map[string]func(s *state, cmd command) error{},
+		registeredCommands: make(map[string]func(s *state, cmd command) error),
 	}
 
 	cmds.register("login", handlerLogin)
 
 	cliArgs := os.Args
 	if len(cliArgs) < 2 {
-		fmt.Println("not enough arguments")
-		os.Exit(1)
+		log.Fatal("Usage: cli <command> [...args]")
 	}
 
 	cmdName := cliArgs[1]
 	cmdArgs := cliArgs[2:]
 
 	cmd := command{
-		name:      cmdName,
-		arguments: cmdArgs,
+		Name:      cmdName,
+		Arguments: cmdArgs,
 	}
 
-	err = cmds.run(&s, cmd)
+	err = cmds.run(programState, cmd)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		log.Fatal(err)
 	}
 }

@@ -11,28 +11,23 @@ type state struct {
 }
 
 type command struct {
-	name      string
-	arguments []string
+	Name      string
+	Arguments []string
 }
 
 type commands struct {
-	functions map[string]func(s *state, cmd command) error
+	registeredCommands map[string]func(s *state, cmd command) error
 }
 
 func (c *commands) run(s *state, cmd command) error {
-	handler, exists := c.functions[cmd.name]
+	handler, exists := c.registeredCommands[cmd.Name]
 	if !exists {
-		return fmt.Errorf("command '%s' does not exist", cmd.name)
+		return fmt.Errorf("command '%s' does not exist", cmd.Name)
 	}
 
-	err := handler(s, cmd)
-	if err != nil {
-		return fmt.Errorf("error while running command '%s': %w", cmd.name, err)
-	}
-
-	return nil
+	return handler(s, cmd)
 }
 
 func (c *commands) register(name string, f func(*state, command) error) {
-	c.functions[name] = f
+	c.registeredCommands[name] = f
 }
