@@ -7,7 +7,7 @@ import (
 
 func handlerLogin(s *state, cmd command) error {
 	if len(cmd.arguments) == 0 {
-		return errors.New("expected 1 argument, none was given")
+		return errors.New("username is required")
 	}
 
 	name := cmd.arguments[0]
@@ -16,7 +16,7 @@ func handlerLogin(s *state, cmd command) error {
 		return err
 	}
 
-	fmt.Printf("user '%s' as been set", name)
+	fmt.Printf("user '%s' as been set\n", name)
 
 	return nil
 }
