@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/dahakeadi15/gator/internal/config"
+	_ "github.com/lib/pq"
 )
 
 func main() {
