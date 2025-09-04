@@ -14,16 +14,22 @@ func handlerLogin(s *state, cmd command) error {
 	if len(cmd.Arguments) != 1 {
 		return fmt.Errorf("usage: %s <name>", cmd.Name)
 	}
-
 	name := cmd.Arguments[0]
 
-	err := s.cfg.SetUser(name)
+	currUser, err := s.db.GetUser(context.Background(), name)
+	if err != nil {
+		if strings.Contains(err.Error(), "no rows") {
+			return fmt.Errorf("user does not exist")
+		}
+		return fmt.Errorf("couldn't find user: %w", err)
+	}
+
+	err = s.cfg.SetUser(currUser.Name)
 	if err != nil {
 		return fmt.Errorf("couldn't set current user: %w", err)
 	}
 
 	fmt.Println("User switched successfully!")
-
 	return nil
 }
 
