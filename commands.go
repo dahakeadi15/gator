@@ -1,16 +1,6 @@
 package main
 
-import (
-	"fmt"
-
-	"github.com/dahakeadi15/gator/internal/config"
-	"github.com/dahakeadi15/gator/internal/database"
-)
-
-type state struct {
-	db  *database.Queries
-	cfg *config.Config
-}
+import "fmt"
 
 type command struct {
 	Name      string
