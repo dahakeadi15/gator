@@ -49,3 +49,29 @@ func printFeed(feed database.Feed) {
 	fmt.Printf(" * URL:       %s\n", feed.Url)
 	fmt.Printf(" * UserId:    %s\n", feed.UserID)
 }
+
+func handlerFeeds(s *state, cmd command) error {
+	if len(cmd.Arguments) != 0 {
+		return fmt.Errorf("usage: %s", cmd.Name)
+	}
+
+	feeds, err := s.db.GetFeeds(context.Background())
+	if err != nil {
+		return fmt.Errorf("couldn't list all feeds: %w", err)
+	}
+
+	fmt.Println("List of all feeds:")
+	for i, feed := range feeds {
+		fmt.Printf("%d:\n", i+1)
+		fmt.Printf(" * Name: %s\n", feed.Name)
+		fmt.Printf(" * URL: %s\n", feed.Url)
+		user, err := s.db.GetUserByID(context.Background(), feed.UserID)
+		if err != nil {
+			return fmt.Errorf("couldn't get user by user.id: %w", err)
+		}
+		fmt.Printf(" * CreatedBy: %s\n", user.Name)
+	}
+	fmt.Println("==================")
+
+	return nil
+}
