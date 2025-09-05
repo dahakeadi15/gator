@@ -64,15 +64,6 @@ func handlerRegister(s *state, cmd command) error {
 	return nil
 }
 
-func handlerReset(s *state, cmd command) error {
-	err := s.db.DeleteAllUsers(context.Background())
-	if err != nil {
-		return fmt.Errorf("couldn't delete users: %w", err)
-	}
-	fmt.Println("Database reset successfully!")
-	return nil
-}
-
 func handlerListUsers(s *state, cmd command) error {
 	users, err := s.db.GetUsers(context.Background())
 	if err != nil {
