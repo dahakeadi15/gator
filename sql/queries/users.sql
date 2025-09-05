@@ -6,7 +6,7 @@ RETURNING *;
 SELECT *
 FROM users
 WHERE name = $1;
--- name: GetUserByID :one
+-- name: GetUserById :one
 SELECT *
 FROM users
 WHERE id = $1;
