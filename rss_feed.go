@@ -7,6 +7,7 @@ import (
 	"html"
 	"io"
 	"net/http"
+	"time"
 )
 
 type RSSFeed struct {
@@ -26,39 +27,40 @@ type RSSItem struct {
 }
 
 func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
+	httpClient := http.Client{
+		Timeout: 10 * time.Second,
+	}
+
 	req, err := http.NewRequestWithContext(ctx, "GET", feedURL, nil)
 	if err != nil {
-		return &RSSFeed{}, fmt.Errorf("error creating http request: %w", err)
+		return nil, fmt.Errorf("error creating http request: %w", err)
 	}
 
 	req.Header.Set("User-Agent", "gator")
 
-	client := http.Client{}
-	res, err := client.Do(req)
+	res, err := httpClient.Do(req)
 	if err != nil {
-		return &RSSFeed{}, fmt.Errorf("error sending http request: %w", err)
+		return nil, fmt.Errorf("error sending http request: %w", err)
 	}
 	defer res.Body.Close()
 
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		return &RSSFeed{}, fmt.Errorf("error reading data: %w", err)
+		return nil, fmt.Errorf("error reading data: %w", err)
 	}
 
-	var feed RSSFeed
-	if err := xml.Unmarshal(data, &feed); err != nil {
-		return &RSSFeed{}, fmt.Errorf("error converting from json: %w", err)
+	var rssFeed RSSFeed
+	if err := xml.Unmarshal(data, &rssFeed); err != nil {
+		return nil, fmt.Errorf("error converting from json: %w", err)
 	}
 
-	feed.Channel.Title = html.UnescapeString(feed.Channel.Title)
-	feed.Channel.Description = html.UnescapeString(feed.Channel.Description)
-	unescapedItems := []RSSItem{}
-	for _, item := range feed.Channel.Item {
+	rssFeed.Channel.Title = html.UnescapeString(rssFeed.Channel.Title)
+	rssFeed.Channel.Description = html.UnescapeString(rssFeed.Channel.Description)
+	for i, item := range rssFeed.Channel.Item {
 		item.Title = html.UnescapeString(item.Title)
 		item.Description = html.UnescapeString(item.Description)
-		unescapedItems = append(unescapedItems, item)
+		rssFeed.Channel.Item[i] = item
 	}
-	feed.Channel.Item = unescapedItems
 
-	return &feed, nil
+	return &rssFeed, nil
 }
