@@ -44,6 +44,7 @@ func main() {
 	cmds.register("addfeed", middlewareLoggedIn(handlerAddFeed))
 	cmds.register("feeds", handlerFeeds)
 	cmds.register("follow", middlewareLoggedIn(handlerFeedFollow))
+	cmds.register("unfollow", middlewareLoggedIn(handlerFeedUnfollow))
 	cmds.register("following", middlewareLoggedIn(handlerListFeedFollows))
 
 	cliArgs := os.Args
