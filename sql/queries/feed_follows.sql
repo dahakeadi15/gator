@@ -5,16 +5,16 @@ WITH inserted_feed_follow AS (
     RETURNING *
 )
 SELECT inserted_feed_follow.*,
-    users.name as user_name,
-    feeds.name as feed_name
+    feeds.name as feed_name,
+    users.name as user_name
 FROM inserted_feed_follow
-    JOIN users ON users.id = inserted_feed_follow.user_id
-    JOIN feeds ON feeds.id = inserted_feed_follow.feed_id;
+    INNER JOIN feeds ON feeds.id = inserted_feed_follow.feed_id
+    INNER JOIN users ON users.id = inserted_feed_follow.user_id;
 -- name: GetFeedFollowsForUser :many
 SELECT feed_follows.*,
-    users.name as user_name,
-    feeds.name as feed_name
+    feeds.name as feed_name,
+    users.name as user_name
 FROM feed_follows
-    JOIN users ON users.id = feed_follows.user_id
-    JOIN feeds ON feeds.id = feed_follows.feed_id
-WHERE users.id = $1;
+    INNER JOIN feeds ON feeds.id = feed_follows.feed_id
+    INNER JOIN users ON users.id = feed_follows.user_id
+WHERE feed_follows.user_id = $1;
