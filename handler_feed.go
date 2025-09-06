@@ -77,5 +77,5 @@ func printFeed(feed database.Feed, user database.User) {
 	fmt.Printf(" * Updated:   %s\n", feed.UpdatedAt)
 	fmt.Printf(" * Name:      %s\n", feed.Name)
 	fmt.Printf(" * URL:       %s\n", feed.Url)
-	fmt.Printf(" * User:    %s\n", user.Name)
+	fmt.Printf(" * User:      %s\n", user.Name)
 }
