@@ -17,4 +17,4 @@ SELECT feed_follows.*,
 FROM feed_follows
     JOIN users ON users.id = feed_follows.user_id
     JOIN feeds ON feeds.id = feed_follows.feed_id
-WHERE users.name = $1;
+WHERE users.id = $1;
