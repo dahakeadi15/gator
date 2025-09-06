@@ -44,16 +44,16 @@ func handlerFeedFollow(s *state, cmd command) error {
 }
 
 func handlerListFeedFollows(s *state, cmd command) error {
-	if len(cmd.Arguments) != 0 {
-		return fmt.Errorf("usage: %s", cmd.Name)
-	}
-
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	currUser, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
 	if err != nil {
 		return fmt.Errorf("couldn't get current user: %w", err)
 	}
 
-	feedFollows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
+	if len(cmd.Arguments) != 0 {
+		return fmt.Errorf("usage: %s", cmd.Name)
+	}
+
+	feedFollows, err := s.db.GetFeedFollowsForUser(context.Background(), currUser.ID)
 	if err != nil {
 		return fmt.Errorf("couldn't get feeds the current user follows: %w", err)
 	}
@@ -63,7 +63,7 @@ func handlerListFeedFollows(s *state, cmd command) error {
 		return nil
 	}
 
-	fmt.Printf("Feeds followed by user %s\n:", user.Name)
+	fmt.Printf("Feeds followed by user %s\n:", currUser.Name)
 	for _, ff := range feedFollows {
 		fmt.Printf(" * %s\n", ff.FeedName)
 	}

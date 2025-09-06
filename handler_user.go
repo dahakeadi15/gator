@@ -16,7 +16,7 @@ func handlerLogin(s *state, cmd command) error {
 	}
 	name := cmd.Arguments[0]
 
-	currUser, err := s.db.GetUser(context.Background(), name)
+	user, err := s.db.GetUser(context.Background(), name)
 	if err != nil {
 		if strings.Contains(err.Error(), "no rows") {
 			return fmt.Errorf("user does not exist")
@@ -24,7 +24,7 @@ func handlerLogin(s *state, cmd command) error {
 		return fmt.Errorf("couldn't find user: %w", err)
 	}
 
-	err = s.cfg.SetUser(currUser.Name)
+	err = s.cfg.SetUser(user.Name)
 	if err != nil {
 		return fmt.Errorf("couldn't set current user: %w", err)
 	}
