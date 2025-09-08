@@ -47,5 +47,5 @@ func printPost(post database.Post) {
 	fmt.Printf(" * Title:        %s\n", post.Title)
 	fmt.Printf(" * URL:          %s\n", post.Url)
 	fmt.Printf(" * Description:  %s\n", post.Description.String)
-	fmt.Printf(" * Published At: %s\n", post.PublishedAt)
+	fmt.Printf(" * Published At: %s\n", post.PublishedAt.Time)
 }

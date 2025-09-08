@@ -57,11 +57,12 @@ func scrapeFeed(db *database.Queries, feed database.Feed) {
 	fmt.Printf("Fetched %d titles from feed %s:\n", len(rssFeed.Channel.Item), rssFeed.Channel.Title)
 	count := 0
 	for _, post := range rssFeed.Channel.Item {
-		// timeFormat := "Mon, 15 Apr 2002 06:30:00 +0000"
-		parsedTime, err := time.Parse(time.RFC1123Z, post.PubDate)
-		if err != nil {
-			log.Printf("couldn't parse time (%s): %v\n", post.PubDate, err)
-			continue
+		publishedAt := sql.NullTime{}
+		if parsedTime, err := time.Parse(time.RFC1123Z, post.PubDate); err == nil {
+			publishedAt = sql.NullTime{
+				Time:  parsedTime,
+				Valid: true,
+			}
 		}
 
 		newPost, err := db.CreatePost(context.Background(), database.CreatePostParams{
@@ -74,7 +75,7 @@ func scrapeFeed(db *database.Queries, feed database.Feed) {
 				String: post.Description,
 				Valid:  true,
 			},
-			PublishedAt: parsedTime,
+			PublishedAt: publishedAt,
 			FeedID:      feed.ID,
 		})
 		if err != nil {
