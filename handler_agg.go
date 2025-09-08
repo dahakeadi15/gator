@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/dahakeadi15/gator/internal/database"
+	"github.com/google/uuid"
 )
 
 func handlerAggregator(s *state, cmd command) error {
@@ -52,8 +55,38 @@ func scrapeFeed(db *database.Queries, feed database.Feed) {
 	}
 
 	fmt.Printf("Fetched %d titles from feed %s:\n", len(rssFeed.Channel.Item), rssFeed.Channel.Title)
-	for _, rssItem := range rssFeed.Channel.Item {
-		fmt.Println(rssItem.Title)
+	count := 0
+	for _, post := range rssFeed.Channel.Item {
+		// timeFormat := "Mon, 15 Apr 2002 06:30:00 +0000"
+		parsedTime, err := time.Parse(time.RFC1123Z, post.PubDate)
+		if err != nil {
+			log.Printf("couldn't parse time (%s): %v\n", post.PubDate, err)
+			continue
+		}
+
+		newPost, err := db.CreatePost(context.Background(), database.CreatePostParams{
+			ID:        uuid.New(),
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+			Title:     post.Title,
+			Url:       post.Link,
+			Description: sql.NullString{
+				String: post.Description,
+				Valid:  true,
+			},
+			PublishedAt: parsedTime,
+			FeedID:      feed.ID,
+		})
+		if err != nil {
+			if !strings.Contains(err.Error(), "duplicate key value violates unique constraint \"posts_url_key\"") {
+				log.Printf("couldn't add post (%s): %v\n", post.Title, err)
+			}
+			continue
+		}
+
+		log.Printf("added post: %s\n", newPost.Title)
+		count++
 	}
+	fmt.Printf("Added %d new posts from %s.\n", count, feed.Name)
 	fmt.Println("==============================")
 }
