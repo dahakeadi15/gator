@@ -17,7 +17,7 @@ func handlerBrowse(s *state, cmd command, user database.User) error {
 	if len(cmd.Arguments) == 1 {
 		parsedLimit, err := strconv.Atoi(cmd.Arguments[0])
 		if err != nil {
-			return fmt.Errorf("limit must be an integer: %w", err)
+			return fmt.Errorf("invalid limit: %w", err)
 		}
 		limit = parsedLimit
 	}
