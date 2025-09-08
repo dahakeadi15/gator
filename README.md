@@ -1,52 +1,58 @@
 # Gator
 
-Gator is a cli RSS Aggrigator. You can register and log in different users. Each of them can add different feeds to fetch/follow. A user can follow multiple feeds and get posts from them.
-
-## Requirements
-
-- Postgres v15+
-- Go v1.25+
+Gator is a multi-user command line tool for aggregating RSS feeds and viewing the posts. Each user can add and/or follow multiple feed and view posts from feeds they follow
 
 ## Installation
 
-Use the go install command to install the gator cli.
+Make sure you have the latest [Go toolchain](https://golang.org/dl/) installed as well as a local Postgres database. You can then install `gator` with:
 
 ```bash
 go install
 ```
 
-## Usage
+## Configuration
 
-You will need to create a config file in your home folder, `~/.gatorconfig.json`:
+Create a `.gatorconfig.json` file in your home directory with the following structure:
 
 ```json
 {
-  "db_url": "postgres://<username>:<password>@localhost:5432/gator",
+  "db_url": "postgres://<username>:<password>@localhost:5432/<database>?sslmode=disable",
   "current_user_name": ""
 }
 ```
 
-Then you can use the following commands:
+Replace the values with your database connection string.
 
-- `login <user_name>` - login as a user
-- `register <user_name>` - register a new user
-- `users` - list all users
-- `agg` - start aggregating feeds
-- `addfeed <feed_name> <feed_url>` - add a new feed to the program
-- `feeds` - list all available feeds
-- `follow <feed_url>` - follow a feed
-- `unfollow <feed_url>` - unfollow a feed
-- `following` - list all the feeds current user follows
-- `browse` - browse latest posts
+## Usage
 
-### Example usage:
+Create a new user:
 
 ```bash
-$ gator login aditya
-User switched successfully!
-
-$ gator following
-Feeds followed by user aditya:
- * TechCrunch
- * Hacker News
+gator register <name>
 ```
+
+Add a feed:
+
+```bash
+gator addfeed <url>
+```
+
+Start the aggregator:
+
+```bash
+gator agg 30s
+```
+
+View the posts:
+
+```bash
+gator browse [limit]
+```
+
+Here are few other commands:
+
+- `gator login <name>` - Log in as a user that already exists
+- `gator users` - List all users
+- `gator feeds` - List all feeds
+- `gator follow <url>` - Follow a feed that already exists in the database
+- `gator unfollow <url>` - Unfollow a feed that already exists in the database
