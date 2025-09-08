@@ -35,17 +35,13 @@ func handlerBrowse(s *state, cmd command, user database.User) error {
 		return nil
 	}
 
-	for i, post := range posts {
-		fmt.Printf("%d:\n", i+1)
-		printPost(post)
+	for _, post := range posts {
+		fmt.Printf("%s from %s\n", post.PublishedAt.Time.Format("Mon Jan 1"), post.FeedName)
+		fmt.Printf("--- %s ---\n", post.Title)
+		fmt.Printf("    %v\n", post.Description.String)
+		fmt.Printf("Link: %s\n", post.Url)
+		fmt.Println("===========================")
 	}
 
 	return nil
-}
-
-func printPost(post database.Post) {
-	fmt.Printf(" * Title:        %s\n", post.Title)
-	fmt.Printf(" * URL:          %s\n", post.Url)
-	fmt.Printf(" * Description:  %s\n", post.Description.String)
-	fmt.Printf(" * Published At: %s\n", post.PublishedAt.Time)
 }
